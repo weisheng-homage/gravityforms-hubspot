@@ -85,6 +85,7 @@ class Base extends \GFFeedAddOn {
 
         // Store this data
         $this->updateSetting(self::TOKEN_SETTING_FIELD, $data);
+        return $data;
     } // function
 
     public function getRedirectURI() {
@@ -96,7 +97,13 @@ class Base extends \GFFeedAddOn {
 
     public function getToken()
     {
-        return $this->getSetting(self::TOKEN_SETTING_FIELD);
+
+        $token = $this->getSetting(self::TOKEN_SETTING_FIELD);
+        if (time() >= $token['hs_expires_in'] - 60) {
+            return $this->refreshOAuthToken($token);
+        }
+        return $token;
+
     }
 
     public function getTokenFromAuthorizationCode ($code = false)
